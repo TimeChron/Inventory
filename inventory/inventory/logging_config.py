@@ -1,36 +1,43 @@
-import logging.config
+from .custom_log_handlers import AppFileHandler, LOG_FILE_PATH
 import os
 
-## BASE LOG DIRECTORY
-LOG_FILE_PATH = '/var/www/django/var/log/'
-
-## Log Configuration
-LOGGING_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+# Log Configuration
+def configure_logger():
+    LOGGING_CONFIG = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'console': {
+                'format': '%(name)-12s %(levelname)-8s %(message)s'
+            },
+            'app-file': {
+                'format': '%(asctime)s %(funcName)s%(name)-12s %(levelname)-8s %(message)s'
+            },
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
         },
-    },
-    'handlers': {
-        'app_file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOG_FILE_PATH, 'inventory.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'console'
+            },
+            'app_file': {
+                'level': 'DEBUG',
+                'class': 'inventory.custom_log_handlers.AppFileHandler',
+                'filename': str(os.path.join(LOG_FILE_PATH, 'inventory.log')),
+                'maxBytes': 1024 * 1024 * 5,
+                'backupCount': 5,
+                'formatter': 'app-file',
+            },
         },
-    },
-    'loggers': {
-        'your_app_name': {
-            'handlers': ['app_file'],
-            'level': 'DEBUG',
-            'propagate': False,
+        'loggers': {
+            'inventory': {
+                'handlers': ['app_file', 'console'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
         },
-    },
-}
-
-logging.config.dictConfig(LOGGING_CONFIG)
+    }
+    return LOGGING_CONFIG
