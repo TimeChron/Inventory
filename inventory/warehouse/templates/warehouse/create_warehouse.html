@@ -1,0 +1,26 @@
+{% extends './warehouse_base.html' %}
+{% block content %}
+<div class="col d-flex align-items-auto justify-content-right">
+    <div class="pt-3 col d-flex align-items-auto justify-content-right">
+        CREATE WAREHOUSE
+        <br>
+        <ul>
+            <li>
+                Please enter a valid picode and valid address before creating the warehouse
+            </li>
+            <li>
+                Don't use spaces or any special chrachter while creating warehouse
+            </li>
+        </ul>
+    </div>
+    <div class="py-3 px-3 my-3 border auto form-group margin">
+    <table>
+    <form method="POST" action = "{% url 'warehouse:CreateWarehouse' %}">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button class="btn btn-secondry" name="create">Create</button>
+    </form>
+    </table>    
+    </div>
+</div>
+{% endblock content %}
